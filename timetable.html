@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5th Semester Timetable - Computer Science Engineering</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .college-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .semester-info {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .academic-year {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .timetable-container {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px 8px;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .subject {
+            background: white;
+            font-weight: 500;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .subject:hover {
+            background: #f0f8ff;
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Subject Color Coding */
+        .core-subject {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .lab-subject {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .elective-subject {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+
+        .break-time {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .empty-slot {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .subject-code {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .room-info {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .legend h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-color.core {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .legend-color.lab {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .legend-color.elective {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+
+        .legend-color.break {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .college-name {
+                font-size: 1.8rem;
+            }
+
+            .timetable-container {
+                padding: 15px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                font-size: 0.8rem;
+            }
+
+            .subject-code, .room-info {
+                font-size: 0.7rem;
+            }
+
+            .legend-items {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .college-name {
+                font-size: 1.5rem;
+            }
+
+            .semester-info {
+                font-size: 1rem;
+            }
+
+            th, td {
+                padding: 6px 3px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Animation */
+        .container {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subject:hover .subject-code {
+            font-weight: 600;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .subject:hover {
+                background: inherit !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="college-name">St. Xavier's College of Engineering</h1>
+                <p class="semester-info">5th Semester - Computer Science Engineering</p>
+                <p class="academic-year">Academic Year: 2024-25</p>
+            </div>
+        </div>
+
+        <div class="timetable-container">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="time-slot">9:00 - 10:00</td>
+                            <td class="subject core-subject">
+                                Database Management Systems
+                                <span class="subject-code">CS501</span>
+                                <span class="room-info">Room 301</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Machine Learning
+                                <span class="subject-code">CS515</span>
+                                <span class="room-info">Room 205</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Computer Networks
+                                <span class="subject-code">CS503</span>
+                                <span class="room-info">Room 302</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                DBMS Lab
+                                <span class="subject-code">CS501L</span>
+                                <span class="room-info">Lab 1</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Software Engineering
+                                <span class="subject-code">CS505</span>
+                                <span class="room-info">Room 203</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Web Technologies
+                                <span class="subject-code">CS517</span>
+                                <span class="room-info">Room 104</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot">10:00 - 11:00</td>
+                            <td class="subject core-subject">
+                                Operating Systems
+                                <span class="subject-code">CS502</span>
+                                <span class="room-info">Room 204</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Database Management Systems
+                                <span class="subject-code">CS501</span>
+                                <span class="room-info">Room 301</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Artificial Intelligence
+                                <span class="subject-code">CS516</span>
+                                <span class="room-info">Room 105</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                DBMS Lab
+                                <span class="subject-code">CS501L</span>
+                                <span class="room-info">Lab 1</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Computer Networks
+                                <span class="subject-code">CS503</span>
+                                <span class="room-info">Room 302</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Theory of Computation
+                                <span class="subject-code">CS504</span>
+                                <span class="room-info">Room 201</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot break-time">11:00 - 11:15</td>
+                            <td class="break-time" colspan="6">Break</td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot">11:15 - 12:15</td>
+                            <td class="subject core-subject">
+                                Theory of Computation
+                                <span class="subject-code">CS504</span>
+                                <span class="room-info">Room 201</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Operating Systems
+                                <span class="subject-code">CS502</span>
+                                <span class="room-info">Room 204</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Software Engineering
+                                <span class="subject-code">CS505</span>
+                                <span class="room-info">Room 203</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                Network Lab
+                                <span class="subject-code">CS503L</span>
+                                <span class="room-info">Lab 2</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Machine Learning
+                                <span class="subject-code">CS515</span>
+                                <span class="room-info">Room 205</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Operating Systems
+                                <span class="subject-code">CS502</span>
+                                <span class="room-info">Room 204</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot">12:15 - 1:15</td>
+                            <td class="subject core-subject">
+                                Computer Networks
+                                <span class="subject-code">CS503</span>
+                                <span class="room-info">Room 302</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Theory of Computation
+                                <span class="subject-code">CS504</span>
+                                <span class="room-info">Room 201</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Database Management Systems
+                                <span class="subject-code">CS501</span>
+                                <span class="room-info">Room 301</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                Network Lab
+                                <span class="subject-code">CS503L</span>
+                                <span class="room-info">Lab 2</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Artificial Intelligence
+                                <span class="subject-code">CS516</span>
+                                <span class="room-info">Room 105</span>
+                            </td>
+                            <td class="empty-slot">Free Period</td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot break-time">1:15 - 2:00</td>
+                            <td class="break-time" colspan="6">Lunch Break</td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot">2:00 - 3:00</td>
+                            <td class="subject core-subject">
+                                Software Engineering
+                                <span class="subject-code">CS505</span>
+                                <span class="room-info">Room 203</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                Software Engineering Lab
+                                <span class="subject-code">CS505L</span>
+                                <span class="room-info">Lab 3</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Web Technologies
+                                <span class="subject-code">CS517</span>
+                                <span class="room-info">Room 104</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Database Management Systems
+                                <span class="subject-code">CS501</span>
+                                <span class="room-info">Room 301</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                AI Lab
+                                <span class="subject-code">CS516L</span>
+                                <span class="room-info">Lab 4</span>
+                            </td>
+                            <td class="empty-slot">Free Period</td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot">3:00 - 4:00</td>
+                            <td class="subject elective-subject">
+                                Artificial Intelligence
+                                <span class="subject-code">CS516</span>
+                                <span class="room-info">Room 105</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                Software Engineering Lab
+                                <span class="subject-code">CS505L</span>
+                                <span class="room-info">Lab 3</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Operating Systems
+                                <span class="subject-code">CS502</span>
+                                <span class="room-info">Room 204</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Theory of Computation
+                                <span class="subject-code">CS504</span>
+                                <span class="room-info">Room 201</span>
+                            </td>
+                            <td class="subject lab-subject">
+                                AI Lab
+                                <span class="subject-code">CS516L</span>
+                                <span class="room-info">Lab 4</span>
+                            </td>
+                            <td class="empty-slot">Free Period</td>
+                        </tr>
+                        <tr>
+                            <td class="time-slot">4:00 - 5:00</td>
+                            <td class="subject elective-subject">
+                                Web Technologies
+                                <span class="subject-code">CS517</span>
+                                <span class="room-info">Room 104</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Computer Networks
+                                <span class="subject-code">CS503</span>
+                                <span class="room-info">Room 302</span>
+                            </td>
+                            <td class="subject elective-subject">
+                                Machine Learning
+                                <span class="subject-code">CS515</span>
+                                <span class="room-info">Room 205</span>
+                            </td>
+                            <td class="subject core-subject">
+                                Software Engineering
+                                <span class="subject-code">CS505</span>
+                                <span class="room-info">Room 203</span>
+                            </td>
+                            <td class="empty-slot">Free Period</td>
+                            <td class="empty-slot">Free Period</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="legend">
+                <h3>Subject Categories</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-color core"></div>
+                        <span>Core Subjects</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color lab"></div>
+                        <span>Laboratory Sessions</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color elective"></div>
+                        <span>Elective Subjects</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color break"></div>
+                        <span>Break Time</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add hover effects and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const subjects = document.querySelectorAll('.subject');
+            
+            subjects.forEach(subject => {
+                subject.addEventListener('mouseenter', function() {
+                    this.style.borderLeft = '4px solid #3498db';
+                });
+                
+                subject.addEventListener('mouseleave', function() {
+                    this.style.borderLeft = 'none';
+                });
+            });
+
+            // Add click functionality to show subject details
+            subjects.forEach(subject => {
+                subject.addEventListener('click', function() {
+                    const subjectName = this.textContent.split('\n')[0].trim();
+                    const subjectCode = this.querySelector('.subject-code').textContent;
+                    const roomInfo = this.querySelector('.room-info').textContent;
+                    
+                    alert(`Subject: ${subjectName}\nCode: ${subjectCode}\nLocation: ${roomInfo}`);
+                });
+            });
+
+            // Highlight current day column
+            const today = new Date().getDay();
+            const dayColumns = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const currentDayIndex = today === 0 ? 6 : today; // Adjust for Sunday being 0
+            
+            if (currentDayIndex >= 1 && currentDayIndex <= 6) {
+                const tableRows = document.querySelectorAll('tbody tr');
+                tableRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells[currentDayIndex] && !cells[currentDayIndex].classList.contains('break-time')) {
+                        cells[currentDayIndex].style.boxShadow = '0 0 10px rgba(52, 152, 219, 0.5)';
+                        cells[currentDayIndex].style.border = '2px solid #3498db';
+                    }
+                });
+            }
+
+            // Add current time highlight
+            const now = new Date();
+            const currentHour = now.getHours();
+            const timeSlots = document.querySelectorAll('.time-slot');
+            
+            timeSlots.forEach(slot => {
+                const timeText = slot.textContent.trim();
+                if (timeText.includes(':')) {
+                    const startHour = parseInt(timeText.split(':')[0]);
+                    if (currentHour === startHour) {
+                        const row = slot.parentElement;
+                        row.style.backgroundColor = 'rgba(46, 204, 113, 0.1)';
+                        row.style.border = '2px solid #2ecc71';
+                    }
+                }
+            });
+        });
+
+        // Print functionality
+        function printTimetable() {
+            window.print();
+        }
+
+        // Export functionality (basic)
+        function exportTimetable() {
+            const content = document.querySelector('.container').outerHTML;
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'timetable_5th_semester.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
