@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black & Orange To-Do List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+    <div class="todo-app">
+        <h1 class="app-title">🍊 To-Do List</h1>
+        
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <select id="prioritySelect">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+                
+            </select>
+            <button id="addTaskBtn">Add Task</button>
+        </div>
+
+        <div class="task-list-container">
+            <h2 class="list-heading">Active Tasks</h2>
+            <ul id="activeTaskList" class="task-list"></ul>
+        </div>
+        
+        <div class="task-list-container">
+            <h2 class="list-heading">Completed Tasks</h2>
+            <ul id="completedTaskList" class="task-list"></ul>
+        </div>
+    </div>
+    
+    <script src="todo.js"></script>
+</body>
+</html>
